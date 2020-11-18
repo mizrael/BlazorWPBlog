@@ -1,0 +1,47 @@
+﻿@page "/categories/{CategoryId:int}/{Slug}"
+@using WordPressPCL
+@using WordPressPCL.Utility
+@using BlazorWPBlog.UI.Services
+@inject WordPressClient WPClient;
+@inject ICategoryService CategoryService;
+
+@if (null != _category)
+{
+    <h3>@_category.Name</h3>
+}
+
+@if (null != _postsQuery)
+{
+    <Posts Query="@_postsQuery"></Posts>
+}
+
+@code
+{
+    [Parameter]
+    public string Slug { get; set; }
+
+    [Parameter]
+    public int CategoryId { get; set; }
+
+    private PostsQueryBuilder _postsQuery;
+    private WordPressPCL.Models.Category _category;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Refresh();
+    }
+
+    private async Task Refresh()
+    {
+        _postsQuery = new PostsQueryBuilder()
+        {
+            Page = 1,
+            PerPage = 10,
+            Order = WordPressPCL.Models.Order.DESC,
+            OrderBy = WordPressPCL.Models.PostsOrderBy.Date,
+            Categories = new[] { CategoryId }
+        };
+
+        _category = await CategoryService.GetTagAsync(CategoryId);
+    }
+}

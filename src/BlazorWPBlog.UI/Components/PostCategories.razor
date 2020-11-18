@@ -1,0 +1,39 @@
+﻿@using WordPressPCL.Models
+@using BlazorWPBlog.UI.Services
+@inject ICategoryService CategoryService;
+
+@if (null != _categories)
+{
+    <div class="post-categories">
+        @foreach (var category in _categories)
+        {
+            <a href="categories/@category.Id/@category.Slug" class="badge badge-info" title="@category.Name">@category.Name</a>
+        }
+    </div>
+}
+else if (_loading)
+{
+    <Loading />
+}
+@code {
+    [Parameter]
+    public WordPressPCL.Models.Post Post { get; set; }
+
+    private IEnumerable<Category> _categories;
+    private bool _loading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Post?.Categories == null)
+            return;
+
+        _loading = true;
+
+        var tasks = Post.Categories.Select(t => CategoryService.GetTagAsync(t));
+        await Task.WhenAll(tasks);
+
+        _categories = tasks.Select(t => t.Result).ToArray();
+
+        _loading = false;
+    }
+}

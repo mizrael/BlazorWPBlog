@@ -14,14 +14,18 @@
     public string AltTitle { get; set; }
 
     [Parameter]
+    public string DefaultSrc { get; set; } = "https://via.placeholder.com/150";
+
+    [Parameter]
     public string CssClass { get; set; }
 
-    private string _imageUrl = "https://via.placeholder.com/150";
+    private string _imageUrl;
 
     protected override async Task OnInitializedAsync()
     {
-        if (!MediaId.HasValue)
-            _imageUrl = string.Empty;
+        if (0 == MediaId.GetValueOrDefault(0))
+            _imageUrl = DefaultSrc;
+
         var media = await WPClient.Media.GetByID(MediaId.Value);
         if (null != media)
             _imageUrl = media.SourceUrl;

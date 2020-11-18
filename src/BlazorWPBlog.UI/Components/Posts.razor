@@ -4,21 +4,33 @@
 
 @if (!_loading && null != _posts)
 {
-    <div class="row">
-        @foreach (var post in _posts)
-        {
-            <div class="col-xs-1 col-md-6 col-lg-4 mb-4">
-                <div class="card bg-dark text-white ">
-                    <MediaImage MediaId="@post.FeaturedMedia" AltTitle="@post.Title.Rendered" CssClass="card-img" />
-                    <div class="card-img-overlay d-flex flex-column">
-                        <h5 class="card-title mt-auto">
-                            <a href="@post.Link" target="_blank" class="text-white" title="@post.Title.Rendered">@((MarkupString) post.Title.Rendered)</a>
-                        </h5>
-                    </div>
+    @foreach (var post in _posts)
+    {
+        <article class="blog-post">
+            
+            @if (0 != post.FeaturedMedia.GetValueOrDefault(0))
+            {
+                <div class="blog-post-thumbnail">
+                    <a href="@post.Link" target="_blank" title="@post.Title.Rendered">
+                        <MediaImage MediaId="@post.FeaturedMedia" AltTitle="@post.Title.Rendered" CssClass="" DefaultSrc=""/>
+                    </a>
                 </div>
+            }
+            <div class="blog-post-title">
+                <h2>
+                    <a href="@post.Link" target="_blank" title="@post.Title.Rendered">@((MarkupString) post.Title.Rendered)</a>
+                </h2>
             </div>
-        }
-    </div>
+            <p class="blog-post-meta">@post.Date.ToShortDateString()</p>
+            <div class="blog-post-excerpt">
+                @((MarkupString) post.Excerpt.Rendered)
+            </div>
+            <div class="blog-post-meta">
+                <PostTags Post="post" />
+                <PostCategories Post="post" />
+            </div>
+        </article>
+    }
 }else if (_loading)
 {
     <Loading />
@@ -41,7 +53,7 @@
     {
         if (null == Query)
             return;
-
+        
         _loading = true;
 
         _posts = await WPClient.Posts.Query(Query);

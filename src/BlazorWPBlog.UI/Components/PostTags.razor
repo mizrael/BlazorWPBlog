@@ -4,10 +4,12 @@
 
 @if (null != _tags)
 {
-    @foreach (var tag in _tags)
-    {
-        <a href="tags/@tag.Id/@tag.Slug" class="badge badge-info" title="@tag.Name">@tag.Name</a>
-    }
+    <div class="post-tags">
+        @foreach (var tag in _tags)
+        {
+            <a href="tags/@tag.Id/@tag.Slug" class="badge badge-info" title="@tag.Name">@tag.Name</a>
+        }
+    </div>
 }
 else if (_loading)
 {
@@ -22,7 +24,7 @@ else if (_loading)
 
     protected override async Task OnInitializedAsync()
     {
-        if (null == Post || null == Post.Tags)
+        if (Post?.Tags == null)
             return;
 
         _loading = true;

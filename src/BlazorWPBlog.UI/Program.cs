@@ -22,6 +22,7 @@ namespace BlazorWPBlog.UI
             builder.Services.AddSingleton(client);
 
             builder.Services.AddSingleton<ITagService, TagService>();
+            builder.Services.AddSingleton<ICategoryService, CategoryService>();
 
             await builder.Build().RunAsync();
         }
