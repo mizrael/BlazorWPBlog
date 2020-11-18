@@ -39,9 +39,7 @@
         Order = Order.DESC,
         OrderBy = PostsOrderBy.Date
     };
-
-    private Posts _posts;
-
+    
     protected override async Task OnInitializedAsync()
     {
         var results = await WPClient.Posts.Query(_featuredPostQuery);
