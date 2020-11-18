@@ -1,0 +1,17 @@
+﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+/* stylelint-disable selector-list-comma-newline-after */
+.card-img-overlay {
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.badge {
+    margin: 0 2px;
+}
+
+.badge:first-child {
+    margin-left: 0;
+}
+
+.badge:last-child {
+    margin-right: 0;
+}

@@ -1,0 +1,30 @@
+﻿@using WordPressPCL
+@inject WordPressClient WPClient;
+
+@if (!string.IsNullOrWhiteSpace(_imageUrl))
+{
+    <img src="@_imageUrl" class="@CssClass" alt="@AltTitle">
+}
+
+@code {
+    [Parameter]
+    public int? MediaId { get; set; }
+
+    [Parameter]
+    public string AltTitle { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    private string _imageUrl = "https://via.placeholder.com/150";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!MediaId.HasValue)
+            _imageUrl = string.Empty;
+        var media = await WPClient.Media.GetByID(MediaId.Value);
+        if (null != media)
+            _imageUrl = media.SourceUrl;
+    }
+
+}

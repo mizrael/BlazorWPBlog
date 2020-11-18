@@ -1,0 +1,44 @@
+﻿@page "/blog/{Slug}"
+@using WordPressPCL
+@using WordPressPCL.Utility
+@inject WordPressClient WPClient;
+
+@if (null != _post)
+{
+<div class="post-@_post.Id post">
+    
+    <div class="post-thumb">
+        <MediaImage MediaId="@_post.FeaturedMedia" AltTitle="@_post.Title.Rendered" />
+    </div>
+
+    <div class="post-title">
+        <h3>@((MarkupString) _post.Title.Rendered)</h3>
+    </div>
+
+    <div class="post-content">@((MarkupString) _post.Content.Rendered)</div>
+
+    <div class="post-meta">
+        <PostTags Post="@_post" />
+    </div>
+
+</div>
+}
+
+@code
+{
+    [Parameter]
+    public string Slug { get; set; }
+
+    private WordPressPCL.Models.Post _post;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var query = new PostsQueryBuilder()
+        {
+            Slugs = new[] { this.Slug }
+        };
+        var posts = await WPClient.Posts.Query(query);
+        if (null != posts && posts.Any())
+            _post = posts.First();
+    }
+}

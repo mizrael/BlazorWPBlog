@@ -1,0 +1,37 @@
+﻿@using WordPressPCL.Models
+@using BlazorWPBlog.UI.Services
+@inject ITagService TagService;
+
+@if (null != _tags)
+{
+    @foreach (var tag in _tags)
+    {
+        <a href="tags/@tag.Id/@tag.Slug" class="badge badge-info" title="@tag.Name">@tag.Name</a>
+    }
+}
+else if (_loading)
+{
+    <Loading />
+}
+@code {
+    [Parameter]
+    public WordPressPCL.Models.Post Post { get; set; }
+
+    private IEnumerable<Tag> _tags;
+    private bool _loading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (null == Post || null == Post.Tags)
+            return;
+
+        _loading = true;
+
+        var tasks = Post.Tags.Select(t => TagService.GetTagAsync(t));
+        await Task.WhenAll(tasks);
+
+        _tags = tasks.Select(t => t.Result).ToArray();
+
+        _loading = false;
+    }
+}

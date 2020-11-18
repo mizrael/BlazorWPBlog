@@ -1,0 +1,39 @@
+﻿@using WordPressPCL
+@using WordPressPCL.Models
+@using WordPressPCL.Utility
+@inject WordPressClient WPClient;
+
+@if (null != _posts)
+{
+    <ul class="list-group">
+        @foreach (var post in _posts)
+        {
+            <li class="list-group-item"><a href="blog/@post.Slug">@((MarkupString) post.Title.Rendered)</a></li>
+        }
+    </ul>
+}
+else if (_loading)
+{
+    <Loading />
+}
+
+@code {
+    private IEnumerable<WordPressPCL.Models.Post> _posts;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+
+        var query = new PostsQueryBuilder()
+        {
+            Page = 1,
+            PerPage = 5,
+            Order = Order.DESC,
+            OrderBy = PostsOrderBy.Date
+        };
+        _posts = await WPClient.Posts.Query(query);
+        
+        _loading = false;
+    }
+}

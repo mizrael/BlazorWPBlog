@@ -1,0 +1,53 @@
+﻿@page "/tags/{TagId:int}/{TagSlug}"
+@using WordPressPCL
+@using WordPressPCL.Models
+@using WordPressPCL.Utility
+@using BlazorWPBlog.UI.Services
+@inject WordPressClient WPClient;
+@inject ITagService TagService;
+
+@if (null != _tag)
+{
+    <h3>@_tag.Name</h3>
+}
+
+@if (null != _postsQuery)
+{
+    <Posts Query="@_postsQuery"></Posts>
+}
+
+@code
+{
+    [Parameter]
+    public string TagSlug { get; set; }
+
+    [Parameter]
+    public int TagId { get; set; }
+
+    private PostsQueryBuilder _postsQuery;
+    private Tag _tag;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Refresh();
+    }
+
+    private async Task Refresh()
+    {
+        _postsQuery = new PostsQueryBuilder()
+        {
+            Page = 1,
+            PerPage = 10,
+            Order = Order.DESC,
+            OrderBy = PostsOrderBy.Date,
+            Tags = new[] {TagId}
+        };
+
+        _tag = await TagService.GetTagAsync(TagId);
+    }
+}

@@ -1,0 +1,51 @@
+﻿@page "/"
+@using WordPressPCL
+@using WordPressPCL.Models
+@using WordPressPCL.Utility
+@inject WordPressClient WPClient;
+
+@if (null != _featuredPost)
+{
+    <div class="card bg-dark text-white mb-4">
+        <MediaImage MediaId="@_featuredPost.FeaturedMedia" AltTitle="@_featuredPost.Title.Rendered" CssClass="card-img" />
+        <div class="card-img-overlay d-flex flex-column">
+            <h5 class="display-4 font-italic my-3">
+                <a href="@_featuredPost.Link" target="_blank" class="text-white" title="@_featuredPost.Title.Rendered">@((MarkupString)_featuredPost.Title.Rendered)</a>
+            </h5>
+        </div>
+    </div>
+}
+@if (null != _postsQuery)
+{
+    <Posts Query="@_postsQuery"></Posts>
+}
+
+@code
+{
+    private Post _featuredPost;
+    private static readonly PostsQueryBuilder _featuredPostQuery = new PostsQueryBuilder()
+    {
+        Page = 1,
+        PerPage = 1,
+        Order = Order.DESC,
+        OrderBy = PostsOrderBy.Date
+    };
+
+    private static readonly PostsQueryBuilder _postsQuery = new PostsQueryBuilder()
+    {
+        Page = 1,
+        PerPage = 10,
+        Offset = 1,
+        Order = Order.DESC,
+        OrderBy = PostsOrderBy.Date
+    };
+
+    private Posts _posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var results = await WPClient.Posts.Query(_featuredPostQuery);
+        if (null != results)
+            _featuredPost = results.FirstOrDefault();
+    }
+}
