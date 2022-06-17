@@ -9,12 +9,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: '6.0.x'
+
     - name: Publish with dotnet
-      run: dotnet publish ./src/ --configuration Release --output build
+      run: |
+        chmod +x .github/workflows/scripts/build.sh
+        .github/workflows/scripts/build.sh
+
     - name: Deploy to Github Pages
       uses: JamesIves/github-pages-deploy-action@v4.3.3
       with:
