@@ -39,9 +39,9 @@
             PerPage = 10,
             Order = WordPressPCL.Models.Order.DESC,
             OrderBy = WordPressPCL.Models.PostsOrderBy.Date,
-            Tags = new[] {TagId}
+            Tags = new List<int>() { TagId }
         };
 
-        _tag = await TagService.GetTagAsync(TagId);
+        _tag = await TagService.GetByIdAsync(TagId);
     }
 }

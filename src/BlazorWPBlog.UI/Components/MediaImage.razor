@@ -26,7 +26,7 @@
         if (0 == MediaId.GetValueOrDefault(0))
             _imageUrl = DefaultSrc;
 
-        var media = await WPClient.Media.GetByID(MediaId.Value);
+        var media = await WPClient.Media.GetByIDAsync(MediaId.Value);
         if (null != media)
             _imageUrl = media.SourceUrl;
     }

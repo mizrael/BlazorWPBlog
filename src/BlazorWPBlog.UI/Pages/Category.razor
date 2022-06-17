@@ -39,9 +39,9 @@
             PerPage = 10,
             Order = WordPressPCL.Models.Order.DESC,
             OrderBy = WordPressPCL.Models.PostsOrderBy.Date,
-            Categories = new[] { CategoryId }
+            Categories = new List<int>() { CategoryId }
         };
 
-        _category = await CategoryService.GetTagAsync(CategoryId);
+        _category = await CategoryService.GetByIdAsync(CategoryId);
     }
 }

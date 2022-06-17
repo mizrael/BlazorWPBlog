@@ -1,62 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using WordPressPCL;
+using WordPressPCL.Models;
 
 namespace BlazorWPBlog.UI.Services
 {
-    public interface ITagService
+    public interface ITagService : IRepository<int, Tag>
     {
-        Task<WordPressPCL.Models.Tag> GetTagAsync(int id);
     }
 
-    public class TagService : ITagService
+    public class TagService : InMemoryRepository<int, Tag>, ITagService
     {
         private readonly WordPressClient _client;
-        private readonly ILogger<TagService> _logger;
-        private static readonly SemaphoreSlim _semaphore;
-        private static IDictionary<int, WordPressPCL.Models.Tag> _tags;
-
-        static TagService()
-        {
-            _semaphore = new SemaphoreSlim(1, 1);
-        }
+        private readonly ILogger<TagService> _logger;      
 
         public TagService(WordPressClient client, ILogger<TagService> logger)
+            : base(() => EnsureTagsAsync(client, logger))
         {
             _client = client;
             _logger = logger;
         }
 
-        public async Task<WordPressPCL.Models.Tag> GetTagAsync(int id)
+        private async static Task<IReadOnlyDictionary<int, Tag>> EnsureTagsAsync(WordPressClient client, ILogger logger)
         {
-            await EnsureTagsAsync(_client);
-
-            _tags.TryGetValue(id, out var tag);
-            return tag;
-        }
-
-        private async Task EnsureTagsAsync(WordPressClient client)
-        {
-            if (null != _tags)
-                return;
-
-            await _semaphore.WaitAsync();
-            try
-            {
-                if (null == _tags)
-                {
-                    _logger.LogInformation($"fetching all tags...");
-                    var tags = await client.Tags.GetAll();
-                    _tags = tags?.ToDictionary(t => t.Id);
-                }
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+            logger.LogInformation($"fetching all tags...");
+            var tags = await client.Tags.GetAllAsync();
+            return tags?.ToDictionary(t => t.Id);
         }
     }
 }
