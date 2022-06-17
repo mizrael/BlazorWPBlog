@@ -6,10 +6,12 @@
 @if (null != _post)
 {
 <div class="post-@_post.Id post">
-    
-    <div class="post-thumb">
-        <MediaImage MediaId="@_post.FeaturedMedia" AltTitle="@_post.Title.Rendered" />
-    </div>
+    @if (0 != _post.FeaturedMedia.GetValueOrDefault(0))
+    {
+        <div class="post-thumb">
+            <MediaImage MediaId="@_post.FeaturedMedia" AltTitle="@_post.Title.Rendered" />
+        </div>
+    }
 
     <div class="post-title">
         <h3>@((MarkupString) _post.Title.Rendered)</h3>
@@ -35,9 +37,9 @@
     {
         var query = new PostsQueryBuilder()
         {
-            Slugs = new[] { this.Slug }
+            Slugs = new List<string>() { this.Slug }
         };
-        var posts = await WPClient.Posts.Query(query);
+        var posts = await WPClient.Posts.QueryAsync(query);
         if (null != posts && posts.Any())
             _post = posts.First();
     }

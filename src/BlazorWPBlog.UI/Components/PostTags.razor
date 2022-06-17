@@ -29,7 +29,7 @@ else if (_loading)
 
         _loading = true;
 
-        var tasks = Post.Tags.Select(t => TagService.GetTagAsync(t));
+        var tasks = Post.Tags.Select(t => TagService.GetByIdAsync(t));
         await Task.WhenAll(tasks);
 
         _tags = tasks.Select(t => t.Result).ToArray();

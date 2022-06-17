@@ -29,7 +29,8 @@ else if (_loading)
 
         _loading = true;
 
-        var tasks = Post.Categories.Select(t => CategoryService.GetTagAsync(t));
+        var tasks = Post.Categories.Select(async t => await CategoryService.GetByIdAsync(t));
+
         await Task.WhenAll(tasks);
 
         _categories = tasks.Select(t => t.Result).ToArray();

@@ -11,14 +11,14 @@
             @if (0 != post.FeaturedMedia.GetValueOrDefault(0))
             {
                 <div class="blog-post-thumbnail">
-                    <a href="@post.Link" target="_blank" title="@post.Title.Rendered">
+                    <a href="/blog/@post.Slug" title="@post.Title.Rendered">
                         <MediaImage MediaId="@post.FeaturedMedia" AltTitle="@post.Title.Rendered" CssClass="" DefaultSrc=""/>
                     </a>
                 </div>
             }
             <div class="blog-post-title">
                 <h2>
-                    <a href="@post.Link" target="_blank" title="@post.Title.Rendered">@((MarkupString) post.Title.Rendered)</a>
+                    <a href="/blog/@post.Slug" title="@post.Title.Rendered">@((MarkupString) post.Title.Rendered)</a>
                 </h2>
             </div>
             <p class="blog-post-meta">@post.Date.ToShortDateString()</p>
@@ -56,7 +56,7 @@
         
         _loading = true;
 
-        _posts = await WPClient.Posts.Query(Query);
+        _posts = await WPClient.Posts.QueryAsync(Query);
 
         _loading = false;
     }

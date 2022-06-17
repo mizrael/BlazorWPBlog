@@ -32,7 +32,7 @@ else if (_loading)
             Order = Order.DESC,
             OrderBy = PostsOrderBy.Date
         };
-        _posts = await WPClient.Posts.Query(query);
+        _posts = await WPClient.Posts.QueryAsync(query);
         
         _loading = false;
     }

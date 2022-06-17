@@ -1,62 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using WordPressPCL;
+using WordPressPCL.Models;
 
 namespace BlazorWPBlog.UI.Services
 {
-    public interface ICategoryService
+    public interface ICategoryService : IRepository<int, Category>
     {
-        Task<WordPressPCL.Models.Category> GetTagAsync(int id);
     }
 
-    public class CategoryService : ICategoryService
+    public class CategoryService : InMemoryRepository<int, Category>, ICategoryService
     {
         private readonly WordPressClient _client;
         private readonly ILogger<CategoryService> _logger;
-        private static readonly SemaphoreSlim _semaphore;
-        private static IDictionary<int, WordPressPCL.Models.Category> _categories;
-
-        static CategoryService()
-        {
-            _semaphore = new SemaphoreSlim(1, 1);
-        }
-
+  
         public CategoryService(WordPressClient client, ILogger<CategoryService> logger)
+             : base(() => EnsureCategories(client, logger))
         {
             _client = client;
             _logger = logger;
         }
 
-        public async Task<WordPressPCL.Models.Category> GetTagAsync(int id)
+        private async static Task<IReadOnlyDictionary<int, Category>> EnsureCategories(WordPressClient client, ILogger logger)
         {
-            await EnsureTagsAsync(_client);
-
-            _categories.TryGetValue(id, out var category);
-            return category;
-        }
-
-        private async Task EnsureTagsAsync(WordPressClient client)
-        {
-            if (null != _categories)
-                return;
-
-            await _semaphore.WaitAsync();
-            try
-            {
-                if (null == _categories)
-                {
-                    _logger.LogInformation($"fetching all categories...");
-                    var categories = await client.Categories.GetAll();
-                    _categories = categories?.ToDictionary(t => t.Id);
-                }
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+            logger.LogInformation($"fetching all categories...");
+            var items = await client.Categories.GetAllAsync();
+            return items?.ToDictionary(t => t.Id);
         }
     }
 }
